@@ -13,4 +13,12 @@ class TVMRetValue : public TVMPODValue_ {
                 type_code_ = type_code;
             }
         }
+        template<typename T>
+        void SwitchToClass(int type_code, T v)  {
+            if(type_code_!=type_code)   {
+                this->Clear();
+                type_code_ = type_code;
+                value_.v_handle = new T(v);
+            }
+        }
 }
