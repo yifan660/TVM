@@ -115,10 +115,29 @@ class TVMRetValue : public TVMPODValue_ {
             }
         }
 
-        void Clear()    {
-            if(type_code)    return;
-            switch()    {
+        template<typename T>
+        void Assign(const T& other)   {
 
+        }
+        void Clear()    {
+            if(type_code_==kTVMNullptr)    return;
+            switch(type_code_)    {
+                case kTVMStr:
+                case kTVMBytes:
+                    delete ptr<std::string>();
+                    break;
+                case kTVMPackedFuncHandle:
+                    static_cast<Object*>(value_.v_handle)->DecRef();
+                    break;
+                case kTVMNDArrayHandle:
+                    NDArray::FFIDecRef(static_cast<TVMArrayHandle>(value_.v_handle));
+                    break;
+                case kTVMModuleHandle:
+                    static_cast<Object*>*(value_.v_handle)->DecRef();
+                    break;
+                case kTVMObjectHandle:
+                    static_cast<Object*>*(value_.v_handle)->DecRef();
+                    break;                
             }
         }
 }
@@ -128,12 +147,3 @@ template<typename TObjectRef, typename = typename std::enable_if<std::is_base_of
 inline bool IsObjectRef() const;
 
 template<typename
-
-
-
-
-
-
-
-
-
