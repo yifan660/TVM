@@ -7,6 +7,66 @@ class TVMRetValue : public TVMPODValue_ {
         }
         ~TVMRetValue()  {this->Clear();}
         
+        TVMRetValue& operator=(TVMRetValue&& other) {
+            this->Clear();
+            value_ = other.value_;
+            type_code_ = other.type_code_;
+            other.type_code_ = kTVMNullptr;
+            return *this;
+        } 
+        TVMRetValue& operator=(double value)    {
+            this->SwitchToPOD(kDLFloat);
+            value_.v_float64 = value;
+            return *this;
+        }
+        TVMRetValue& operator=(std::nullptr_t value)    {
+            this->SwitchToPOD(kTVMNullptr);
+            value_.v_handle = value;
+            return *this;
+        }
+        TVMRetValue& operator=(void* value) {
+            this->SwitchToPOD(kTVMOpaqueHandle);
+            value_.v_handle = value;
+            return *this;
+        }
+        TVMRetValue& operator=(int64_t value) {
+            this->SwitchToPOD(kDLInt);
+            value_.v_int64 = value;
+            return *this;
+        }
+        TVMRetValue& operator=(int value) {
+            this->SwitchToPOD(kDLInt);
+            value_.v_int64 = value;
+            return *this;
+        }
+        TVMRetValue& operator=(DLDevice value) {
+            this->SwitchToPOD(kDLDevice);
+            value_.v_device = value;
+            return *this;
+        }
+        TVMRetValue& operator=(DLDataType t)    {
+            this->SwitchToPOD(kTVMDataType);
+            value_.v_device = t;
+            return *this;
+        }
+
+        TVMRetValue& operator=(bool value)    {
+            this->SwitchToPOD(kDLInt);
+            value_.v_device = t;
+            return *this;
+        }
+
+        TVMRetValue& operator=(DLDataType t)    {
+            this->SwitchToPOD(kTVMDataType);
+            value_.v_device = t;
+            return *this;
+        }
+
+                TVMRetValue& operator=(DLDataType t)    {
+            this->SwitchToPOD(kTVMDataType);
+            value_.v_device = t;
+            return *this;
+        }
         using TVMPODValue_::operator double;
         using TVMPODValue_::operator int64_t;
         using TVMPODValue_::operator uint6_t;
@@ -71,6 +131,9 @@ template<typename TObjectRef, typename = typename std::enable_if<std::is_base_of
 inline bool IsObjectRef() const;
 
 template<typename
+
+
+
 
 
 
