@@ -52,21 +52,20 @@ class TVMRetValue : public TVMPODValue_ {
 
         TVMRetValue& operator=(bool value)    {
             this->SwitchToPOD(kDLInt);
-            value_.v_device = t;
+            value_.v_int64 = value;
             return *this;
         }
 
-        TVMRetValue& operator=(DLDataType t)    {
-            this->SwitchToPOD(kTVMDataType);
-            value_.v_device = t;
+        TVMRetValue& operator=(std::string value)    {
+            this->SwitchToClass(kTVMStr, value);
             return *this;
         }
 
-                TVMRetValue& operator=(DLDataType t)    {
-            this->SwitchToPOD(kTVMDataType);
-            value_.v_device = t;
+        TVMRetValue& operator=(TVMByteArray value)    {
+            this->SwitchToClass(kTVMBytes, std::string(value.data, value.size));
             return *this;
         }
+
         using TVMPODValue_::operator double;
         using TVMPODValue_::operator int64_t;
         using TVMPODValue_::operator uint6_t;
@@ -117,9 +116,7 @@ class TVMRetValue : public TVMPODValue_ {
         }
 
         void Clear()    {
-            if()    {
-                
-            }
+            if(type_code)    return;
             switch()    {
 
             }
@@ -131,6 +128,8 @@ template<typename TObjectRef, typename = typename std::enable_if<std::is_base_of
 inline bool IsObjectRef() const;
 
 template<typename
+
+
 
 
 
