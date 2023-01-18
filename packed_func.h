@@ -1,5 +1,3 @@
-
-
 class TVMPODValue_  {
     public:
         operator double() const {
