@@ -1,3 +1,26 @@
+
+
+class TVMPODValue_  {
+    public:
+        operator double() const {
+            if(type_code_ == kDLInt)    {
+                return static_cast<double>(value_.v_int64);
+            }
+            TVM_CHECK_TYPE_CODE(type_code_, kDLFloat);
+            return value_.v_float64;
+        }
+
+        operator int64_t() const    {
+            TVM_CHECK_TYPE_CODE(type_code_, kDLInt);
+            return value_.v_int
+        }
+
+        operator int64_t() const    {
+            TVM_CHECK_TYPE_CODE();
+            return value_.v_float64
+        }
+};
+
 class TVMRetValue : public TVMPODValue_ {
     public:
         TVMRetValue()   {}
