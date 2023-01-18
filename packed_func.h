@@ -10,12 +10,29 @@ class TVMPODValue_  {
 
         operator int64_t() const    {
             TVM_CHECK_TYPE_CODE(type_code_, kDLInt);
-            return value_.v_int
+            return value_.v_int64;
         }
 
-        operator int64_t() const    {
-            TVM_CHECK_TYPE_CODE();
-            return value_.v_float64
+        operator uint64_t() const   {
+            TVM_CHECK_TYPE_CODE(type_code_, kDLInt);
+            return value_.v_int64;
+        }
+
+        operator int() const    {
+            TVM_CHECK_TYPE_CODE(type_code_, kDLInt);
+            ICHECK_LE(value_.v_int64, std::numeric_limits<int>::max());
+            ICHECK_GE(value_.v_int64, std::numeric_limits<int>::min());
+            return static_cast<int>(value_.v_int64);
+        }
+
+        operator bool() const   {
+            TVM_CHECK_TYPE_CODE(type_code_, kDLInt);
+            return value_.v_int64 != 0;
+        }
+
+        operator void*() const  {
+            if(type_code_ == kTVMNullptr)   return nullptr;
+            if()
         }
 };
 
