@@ -147,6 +147,21 @@ class TVMRetValue : public TVMPODValue_ {
             this->Assign(other);
             return *this;
         }
+
+        void MoveToCHost(TVMValue* ret_value, int* ret_type_code)  {
+            ICHECK(type_code_ != kTVMStr && type_code_ != kTVMBytes);
+            *ret_value = value_;
+            *ret_type_code = type_code_;
+            type_code_ = kTVMNullptr;
+        }
+
+        static TVMRetValue MoveFromCHost(TVMValue value, int type_code) {
+            ICHECK(type_code <= kTVMPackedFuncHandle || type_code == kTVMNDArrayHandle);
+            TVMRetValue ret;
+            ret.value_ = value;
+            ret.type_code_ = type_code;
+            return ret;
+        }
         // IsObjectRef will be called only when ObjectRef is base class of TObjectRef
         template<typename TObjectRef, typename = typename std::enable_if<std::is_base_of<ObjectRef, TObjectRef>::value>::type>
         inline bool IsObjectRef() const;
