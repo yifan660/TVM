@@ -105,6 +105,18 @@ class TVMRetValue : public TVMPODValue_ {
             return *this;
         }
 
+        TVMRetValue& operator=(NDArray other)   {
+            if(other.data_ != nullptr)  {
+                this->clear();
+                type_code_ = kTVMNDArrayHandle;
+                value_.v_handle = NDArray::FFIGetHandle(other);
+                ObjectRef::FFIClearAfterMove(&other);
+            } else  {
+                SwitchToPOD(kTVMNullptr);
+                value_.v_handle = nullptr;
+            }
+            return *this;
+        }
         // IsObjectRef will be called only when ObjectRef is base class of TObjectRef
         template<typename TObjectRef, typename = typename std::enable_if<std::is_base_of<ObjectRef, TObjectRef>::value>::type>
         inline bool IsObjectRef() const;
