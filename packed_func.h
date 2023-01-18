@@ -162,9 +162,17 @@ class TVMRetValue : public TVMPODValue_ {
             ret.type_code_ = type_code;
             return ret;
         }
+
+        const TVMValue& value() const   {
+            ICHECK(type_code_ != kTVMObjectHandle && type_code_ != kTVMPackedFuncHandle && type_code_ != kTVMModuleHandle && type_code_ != kTVMStr) << "TVMRetValue.value can only be used for POD data";
+            return value_;
+        }
+
         // IsObjectRef will be called only when ObjectRef is base class of TObjectRef
         template<typename TObjectRef, typename = typename std::enable_if<std::is_base_of<ObjectRef, TObjectRef>::value>::type>
-        inline bool IsObjectRef() const;
+        inline TVMRetValue& operator=(TObjectRef other);
+        template<typename T, typename = typename std::enable_if<std::is_class<T>::value>::type>
+        inline operator T() const;
 
     private:
         void SwitchToPOD(int type_code)  {
