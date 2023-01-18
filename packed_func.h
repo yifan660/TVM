@@ -117,6 +117,36 @@ class TVMRetValue : public TVMPODValue_ {
             }
             return *this;
         }
+
+        TVMRetValue& operator=(Module m)    {
+            SwitchToObject(kTVMModuleHandle, std::move(m.data_));
+            return *this;
+        }
+
+        TVMRetValue& operator=(PackedFunc f)    {
+            this->SwitchToObject(kTVMPackedFuncHandle, std::move(f.data_));
+            return *this;
+        }
+
+        template<typename FType>
+        TVMRetValue& operator=(const TypedPackedFunc<FType>& f)    {
+            return operator=(f.packed());
+        }
+
+        TVMRetValue& operator=(const TVMRetValue& other)    {
+            this->Assign(other);
+            return *this;
+        }
+
+        TVMRetValue& operator=(const TVMArgValue& other)    {
+            this->Assign(other);
+            return *this;
+        }    
+
+        TVMRetValue& operator=(TVMMovableArgValue_&& other)    {
+            this->Assign(other);
+            return *this;
+        }
         // IsObjectRef will be called only when ObjectRef is base class of TObjectRef
         template<typename TObjectRef, typename = typename std::enable_if<std::is_base_of<ObjectRef, TObjectRef>::value>::type>
         inline bool IsObjectRef() const;
