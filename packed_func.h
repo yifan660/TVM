@@ -117,7 +117,34 @@ class TVMRetValue : public TVMPODValue_ {
 
         template<typename T>
         void Assign(const T& other)   {
-
+            switch(other.type_code_)    {
+                case kTVMStr:
+                    SwitchToClass<std::string>(kTVMStr, other);
+                    break;
+                case kTVMBytes:
+                    SwitchToClass<std::string>(kTVMBytes, other);
+                    break;
+                case kTVMPackedFuncHandle:
+                    *this = other.operator PackedFunc();
+                    break;
+                case kTVMModuleHandle:
+                    *this = other.operator Module();
+                    break;
+                case kTVMNDArrayHandle:
+                    *this = other.operator NDArray();
+                    break;
+                case kTVMObjectHandle:
+                    SwitchToObject(kTVMObjectHandle, GetObjectPtr<Object>(static_cast<Object*>(other.value_.v_handle)));
+                    break;
+                case kTVMObjectRValueRefArg: 
+                    operator=(other.operator ObjectRef());
+                    break;
+                default:
+                    SwitchToPOD(other.type_code());
+                    value_ = other.value_;
+                    break;
+            
+            }
         }
         void Clear()    {
             if(type_code_==kTVMNullptr)    return;
