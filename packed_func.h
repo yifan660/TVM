@@ -7,6 +7,45 @@ class TVMRetValue : public TVMPODValue_ {
         }
         ~TVMRetValue()  {this->Clear();}
         
+        using TVMPODValue_::operator double;
+        using TVMPODValue_::operator int64_t;
+        using TVMPODValue_::operator uint6_t;
+        using TVMPODValue_::operator int;
+        using TVMPODValue_::operator bool;
+        using TVMPODValue_::operator void*;
+        using TVMPODValue_::operator DLTensor*;
+        using TVMPODValue_::operator Device;
+        using TVMPODValue_::operator NDArray;
+        using TVMPODValue_::operator Module;
+        using TVMPODValue_::operator PackedFunc;
+        using TVMPODValue_::AsObjectRef;
+        using TVMPODValue_::IsObjectRef;
+
+        TVMRetvalue(const TVMRetValue& other) : TVMPODValue_()  {this->Assign(other);}
+        operator std::string() const    {
+            if(type_code_ == kTVMDataType)  {
+                return DLDataType2String(operator DLDataType());
+            } else if(type_code_ == kTVMBytes)  {
+                return *ptr<std::string>();
+            }
+            TVM_CHECK_TYPE_CODE(type_code_, kTVMStr);
+            return *ptr<std::string>();
+        }
+
+        operator DLDataType() const {
+            if(type_code_ == kTVMStr)   {
+                return String2DLDataType(operator std::string());
+            }
+            TVM_CHECK_TYPE_CODE(type_code_, kTVMDataType);
+            return value_.v_type;
+        }
+
+        operator DataType() const   {return DataType(operator DLDataType());}
+        template <typename FType>
+        operator TypedPackedFunc<FType>() const {
+            return TypedPackedFunc<FType>(operator PackedFunc());
+        }
+
         TVMRetValue& operator=(TVMRetValue&& other) {
             this->Clear();
             value_ = other.value_;
@@ -66,25 +105,11 @@ class TVMRetValue : public TVMPODValue_ {
             return *this;
         }
 
-        using TVMPODValue_::operator double;
-        using TVMPODValue_::operator int64_t;
-        using TVMPODValue_::operator uint6_t;
-        using TVMPODValue_::operator int;
-        using TVMPODValue_::operator bool;
-        using TVMPODValue_::operator void*;
-        using TVMPODValue_::operator DLTensor*;
-        using TVMPODValue_::operator Device;
-        using TVMPODValue_::operator NDArray;
-        using TVMPODValue_::operator Module;
-        using TVMPODValue_::operator PackedFunc;
-        using TVMPODValue_::AsObjectRef;
-        using TVMPODValue_::IsObjectRef;
+        // IsObjectRef will be called only when ObjectRef is base class of TObjectRef
+        template<typename TObjectRef, typename = typename std::enable_if<std::is_base_of<ObjectRef, TObjectRef>::value>::type>
+        inline bool IsObjectRef() const;
 
-        TVMRetvalue(const TVMRetValue& other) : TVMPODValue_()  {this->Assign(other);}
-        operator std::string() const    {
-            if(type_code_)
-        }
-
+    private:
         void SwitchToPOD(int type_code)  {
             if(type_code_!=type_code)   {
                 this->Clear();
@@ -168,9 +193,3 @@ class TVMRetValue : public TVMPODValue_ {
             }
         }
 }
-
-// IsObjectRef will be called only when ObjectRef is base class of TObjectRef
-template<typename TObjectRef, typename = typename std::enable_if<std::is_base_of<ObjectRef, TObjectRef>::value>::type>
-inline bool IsObjectRef() const;
-
-template<typename
