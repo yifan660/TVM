@@ -80,6 +80,9 @@ class TVMPODValue_  {
         friend class TVMMovableArgValue_;
         TVMPODValue_() : type_code_(kTVMNullptr)    {}
         TVMPODValue_(TVMValue value, int type_code) : value_(value), type_code_(type_code)  {}
+
+        TVMValue value_;
+        int type_code_;
 };
 
 class TVMRetValue : public TVMPODValue_ {
