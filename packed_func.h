@@ -68,6 +68,18 @@ class TVMPODValue_  {
             TVM_CHECK_TYPE_CODE(type_code_, kTVMPackedFuncHandle);
             return PackedFunc(ObjectPtr<Object>(static_cast<Object*>(value_.v_handle)));
         }
+
+        operator Device() const {
+            TVM_CHECK_TYPE_CODE(type_code_, kDLDevice);
+            return
+        }
+    
+    protected:
+        friend class TVMArgsSetter;
+        friend class TVMRetValue;
+        friend class TVMMovableArgValue_;
+        TVMPODValue_() : type_code_(kTVMNullptr)    {}
+        TVMPODValue_(TVMValue value, int type_code) : value_(value), type_code_(type_code)  {}
 };
 
 class TVMRetValue : public TVMPODValue_ {
