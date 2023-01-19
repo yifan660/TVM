@@ -54,7 +54,19 @@ class TVMPODValue_  {
         }
 
         operator Module() const     {
-            
+            if(type_code_ == kTVMNullptr)   {
+                return Module(ObjectPtr<Object>(nullptr));
+            }
+            TVM_CHECK_TYPE_CODE(type_code_, kTVMModuleHandle);
+            return Module(ObjectPtr<Object>(static_cast<Object*>(value_.v_handle)));
+        }
+
+        operator PackedFunc() const {
+            if(type_code_ == kTVMNullptr)   {
+                return PackedFunc(ObjectPtr<Object>(nullptr));
+            }
+            TVM_CHECK_TYPE_CODE(type_code_, kTVMPackedFuncHandle);
+            return PackedFunc(ObjectPtr<Object>(static_cast<Object*>(value_.v_handle)));
         }
 };
 
