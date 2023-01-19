@@ -73,7 +73,18 @@ class TVMPODValue_  {
             TVM_CHECK_TYPE_CODE(type_code_, kDLDevice);
             return
         }
-    
+        
+        int type_code() const   { return type_code_;}
+        template<typename T>
+        T* ptr() const  {
+            return static_cast<T*>(value_.v_handle);
+        }
+
+        template<typename TObjectRef, typename = typename std::enable_if<std::is_base_of<ObjectRef, TObjectRef>::value>::type>
+        inline bool IsObjectRef() const;
+        template <typename TObjectRef>
+        inline TObjectRef AsObjectRef() const;
+
     protected:
         friend class TVMArgsSetter;
         friend class TVMRetValue;
