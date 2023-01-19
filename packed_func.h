@@ -355,4 +355,4 @@ class TVMRetValue : public TVMPODValue_ {
                     break;                
             }
         }
-}
+};
