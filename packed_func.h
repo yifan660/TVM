@@ -32,7 +32,29 @@ class TVMPODValue_  {
 
         operator void*() const  {
             if(type_code_ == kTVMNullptr)   return nullptr;
-            if()
+            if(type_code_ == kTVMDLTensorHandle)    return value_.v_handle;
+            TVM_CHECK_TYPE_CODE(type_code_, kTVMOpaqueHandle);
+            return value_.v_handle;
+        }
+
+        operator DLTensor*() const  {
+            if(type_code_ == kTVMDLTensorHandle || type_code_ == kTVMNDArrayHandle) {
+                return static_cast<DLTensor*>(value_.v_handle);
+            } else  {
+                if(type_code_ == kTVMNullptr) return nullptr;
+                LOG(FATAL) << "Expected" << "DLTensor* or NDArray but got" << ArgTypeCode2Str(type_code_);
+                return nullptr;
+            }
+        }
+
+        operator NDArray() const    {
+            if(type_code_ == kTVMNullptr)   return NDArray(ObjectPtr<Object>(nullptr));
+            TVM_CHECK_TYPE_CODE(type_code_, kTVMNDArrayHandle);
+            return NDArray(NDArray::FFIDataFromHandle(static_cast<TVMArrayHandle>(value_.v_handle)));
+        }
+
+        operator Module() const     {
+            
         }
 };
 
