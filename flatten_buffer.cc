@@ -28,4 +28,16 @@ class BufferFlattener : public StmtExprMutator  {
 class Allocate : public Stmt    {
     public:
         TVM_DLL Allocate(Var )
-}
+};
+
+class AllocateConstNode : public StmtNode   {
+    public:
+        Var buffer_var;
+        Optional<runtime::NDArray> data;
+        Optional<Integer> irmod_storage_idx;
+        DataType dtype;
+        Array<PrimExpr> extents;
+        Stmt body;
+
+};
+
