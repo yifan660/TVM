@@ -37,12 +37,25 @@ class BufferFlattener : public StmtExprMutator  {
             if(!writes.same_as(op->writes))   {
                 block.CopyOnWrite()->writes = writes;
             }
+
+            return StmtExprMutator::VisitStmt_(block.get());
         }
 
         Stmt VisitStmt_(const AllocateNode* op) final {
             Allocate alloc = Downcast<Allocate>(StmtExprMutator::VisitStmt_(op));
             if(alloc->dtype == DataType::Bool())
-        }
+                auto writer = alloc.CopyOnWrite();
+                writer->dtype = DataType::Int(8);
+            }
+
+            if(alloc->extents.size() == 1)  {
+                // No flattening required for buffers that are already flat
+                if(auto* decl_buffer = alloc->body.as<DeclBufferNode>())    {
+                    alloc.CopyOnWrite()->body = std::move(decl_buffer->body);
+                }
+
+                return std::move(alloc);
+            }
 }
 
 class Allocate : public Stmt    {
@@ -70,5 +83,6 @@ class AllocateConstNode : public StmtNode   {
             v->Visit();
         }
 };
+
 
 
