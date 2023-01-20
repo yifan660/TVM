@@ -56,6 +56,45 @@ class BufferFlattener : public StmtExprMutator  {
 
                 return std::move(alloc);
             }
+
+            if(auto* decl_buffer = alloc->body.as<DeclBufferNode>(); decl_buffer && decl_buffer->buffer->data.same_as(alloc->buffer_var))   {
+                auto& buffer = decl_buffer->buffer;
+                bool matching_buffer = [&]()    {
+                    if(alloc->dtype != buffer->dtype)   {
+                        return false;
+                    }
+                    if(alloc->extents.size() != buffer->shape.size())   {
+                        return false;
+                    }
+                    ExprDeepEqual expr_equal;
+                    for(size_t i=0;i<alloc->extents.size();i++) {
+                        if(!expr_equal(alloc->extents[i], buffer->shape[i]))    {
+                            return false;
+                        }
+                    }
+                    return true;
+                }();
+
+                if(matching_buffer) {
+                    Buffer flattened = GetFlattenedBuffer(buffer);
+                    
+                    auto n = alloc.CopyOnWrite();
+                    n->body = std::move(decl_buffer->body);
+                    n->extents = flattened->shape;
+                    return std::move(alloc);
+                } else  {
+                    ICHECK(decl_buffer->buffer->axis_separators.empty()) << "DeclBuffer node doesn't match Allocate extents, but also shouldn't be "
+                }
+            }
+
+            PrimExpr flat_extent = 1;
+            for(const auto& dim : alloc->extents)   {
+                flat_extent *= dim;
+            }
+
+            auto n = alloc.CopyOnWrite();
+            n->extents = {flat_extent};
+            return std::move(alloc);
 }
 
 class Allocate : public Stmt    {
@@ -83,6 +122,4 @@ class AllocateConstNode : public StmtNode   {
             v->Visit();
         }
 };
-
-
 
