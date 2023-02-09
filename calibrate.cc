@@ -639,7 +639,18 @@ void get_omega(tensor sigma, int target_bins)    {
     return omega
 }
 
-variance 
+void std(tensor t) {
+    // calculate variance
+    // standard deviation is sqrt of variance
+    mean = std::accumulate(tensor.start,tensor.end);
+    for(int n=0; n<shape[0]*shape[1]; n++)   {
+        var = var + ((tensor[n] - mean) * (tensor[n] - mean));
+        n++;
+    }
+    var /= numPoints;
+    sd = sqrt(var);
+} 
+
 float mid_tread_quantization()
 {
     std::accumulate();
@@ -647,6 +658,27 @@ float mid_tread_quantization()
     // get the standard deviation of each element of tensor
     for(int i=0;i<shape[0]*shape[1];i++)   {
         std[i] = tensor[i].std(0);
+    }
+    
+    get_omega
+    if(clip==true)    {
+        if(sym==true)    {
+            rng = (2*alpha_mult*b);
+        } else  {
+            rng = std::max()+alpha_mult*b;
+        }
+    } else  {
+        if()    {
+            rng = tensor::max() - tensor::min();    // tensor 
+        } else if() {
+            rng = tensor::max();
+        }
+    }
+
+    Delta = torch.where(omega > 0, rng / omega, tensor.new_tensor([np.finfo(np.float32).max]))
+    float Delta;
+    for()   {
+        
     }
 
     std = tensor.std(-1)
